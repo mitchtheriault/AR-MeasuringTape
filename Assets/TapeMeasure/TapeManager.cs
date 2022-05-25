@@ -22,8 +22,10 @@ public class TapeManager : MonoBehaviour
     public GameObject floatingDistanceObject;
 
     public LineRenderer line;
+    
+    bool placementEnabled = true;
 
-    public bool placementEnabled = true;
+    Unit currentUnit = Unit.m;
 
     void Start()
     {
@@ -112,8 +114,30 @@ public class TapeManager : MonoBehaviour
         {
             distanceBetweenPoints = Vector3.Distance(tapePoints[0].transform.position, tapePoints[1].transform.position);
         }
-        
-        string distanceStr = distanceBetweenPoints.ToString("#.##") + "m";
+
+        //convert units
+        float convertedDistance = 0f;
+
+        switch (currentUnit)
+        {
+            case Unit.m:
+                convertedDistance = distanceBetweenPoints;
+                break;
+            case Unit.cm:
+                convertedDistance = distanceBetweenPoints * 100;
+                break;
+            case Unit.i:
+                convertedDistance = distanceBetweenPoints / 0.0254f;
+                break;
+            case Unit.f:
+                convertedDistance = distanceBetweenPoints * 3.2808f;
+                break;
+            default:
+                break;
+        }
+
+        //change the text to display the distance
+        string distanceStr = convertedDistance.ToString("#.##") + currentUnit;
 
         distanceText.text = distanceStr;
         floatingDistanceText.text = distanceStr;
@@ -158,4 +182,18 @@ public class TapeManager : MonoBehaviour
 
     }
 
+    //casting string (from the inspector) into a Unit so we can act upon it
+    public void ChangeUnit(string unit)
+    {
+        currentUnit = (Unit)System.Enum.Parse(typeof (Unit), unit);
+    }
+
+
+}
+
+public enum Unit {
+    m,
+    cm,
+    i,
+    f
 }
