@@ -7,15 +7,14 @@ using TMPro;
 
 public class TapeManager : MonoBehaviour
 {
+    ARRaycastManager aRRaycastManager;
+
     public GameObject[] tapePoints;
+    public GameObject reticle;
 
     float distanceBetweenPoints = 0f;
 
     int currentTapePoint = 0;
-
-    ARRaycastManager aRRaycastManager;
-
-    public GameObject reticle;
 
     public TMP_Text distanceText;
 
@@ -41,7 +40,7 @@ public class TapeManager : MonoBehaviour
         // shoot a raycast from the center of the screen
         List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
-        aRRaycastManager.Raycast(new Vector2(Screen.width / 2, Screen.height / 2), hits, TrackableType.Planes);
+        aRRaycastManager.Raycast(new Vector2(Screen.width / 2, Screen.height / 2), hits, TrackableType.PlaneWithinPolygon);
 
         //if the raycast hits a plane, update the reticle
         if (hits.Count > 0)
@@ -62,7 +61,6 @@ public class TapeManager : MonoBehaviour
             }
                 
             //if the user taps, place a tape point. disable more placements until the end of the touch
-
             if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
             {
                 if (currentTapePoint < 2)
@@ -78,13 +76,14 @@ public class TapeManager : MonoBehaviour
         }
 
         //if the raycast isn't hitting anything, don't display the reticle
-        else if (hits.Count == 0)
+        else if (hits.Count == 0 || currentTapePoint == 2)
         {
             reticle.SetActive(false);
         }
 
     }
 
+    //change the position of the approperiate tape point and make it active.
     public void PlacePoint(Vector3 pointPosition, int pointIndex)
     {
         tapePoints[pointIndex].SetActive(true);
@@ -157,9 +156,6 @@ public class TapeManager : MonoBehaviour
 
         floatingDistanceObject.transform.rotation = Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up);
 
-
     }
-
-
 
 }
